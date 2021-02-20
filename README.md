@@ -15,4 +15,4 @@ Two techniques looked at here are **cross entropy** and **hill climbing**.
 
 ### Installing required packages
 To install all required packages, run:
-```pip install -r .```
+```pip install -r requirements.txt```
