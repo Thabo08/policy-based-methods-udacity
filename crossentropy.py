@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -91,8 +90,8 @@ class Agent(nn.Module):
 
 def cross_entropy_method(agent_, num_episodes=500, sigma=.5, population_size=50, discount_factor=1.0,
                          max_iterations=1000, elite_frac=.2, filename='checkpoint.pth'):
-    """
-    Implements the cross entropy method to train the agent
+    """ Implements the cross entropy method to train the agent. The goal with cross entropy is to evaluate the policy
+    return by passing the average weight of the top X weights to the neural network
     :param filename: file name to store the model weights
     :param elite_frac: percentage of top policies to use in update
     :param discount_factor:
@@ -106,17 +105,17 @@ def cross_entropy_method(agent_, num_episodes=500, sigma=.5, population_size=50,
     scores = []
     scores_deque = deque(maxlen=100)
     additive_noise = sigma * np.random.randn(agent_.get_weights_dim())
-    best_weight = additive_noise
+    best_avg_weight = additive_noise
     num_elite = int(elite_frac * population_size)
     for episode in range(1, num_episodes + 1):
-        population_weights = [best_weight + additive_noise for _ in range(population_size)]
+        population_weights = [best_avg_weight + additive_noise for _ in range(population_size)]
         rewards = np.array([agent_.evaluate(weights, discount_factor, max_iterations) for weights in population_weights])
 
         elite_indexes = rewards.argsort()[-num_elite:]
         elite_weights = [population_weights[i] for i in elite_indexes]
-        best_weight = np.array(elite_weights).mean(axis=0)
+        best_avg_weight = np.array(elite_weights).mean(axis=0)
 
-        reward = agent_.evaluate(best_weight, discount_factor=discount_factor)
+        reward = agent_.evaluate(best_avg_weight, discount_factor=discount_factor)
         scores_deque.append(reward)
         scores.append(reward)
 
