@@ -1,11 +1,5 @@
-import gym
-import math
-import numpy as np
-from collections import deque
-import matplotlib.pyplot as plt
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+
+from common import *
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -69,7 +63,7 @@ class Agent(nn.Module):
         episode_return = .0
         state = self.env.reset()
         for it in range(max_iterations):
-            state = torch.from_numpy(state).float().to(device)
+            state = torch.from_numpy(state).float().to(DEVICE)
             action = self.forward(state)
             state, reward, done, _ = self.env.step(action)
             episode_return += reward * math.pow(discount_factor, it)
@@ -148,7 +142,7 @@ def test(agent, filename):
     state = env.reset()
     img = plt.imshow(env.render(mode='rgb_array'))
     while True:
-        state = torch.from_numpy(state).float().to(device)
+        state = torch.from_numpy(state).float().to(DEVICE)
         with torch.no_grad():
             action = agent(state)
         img.set_data(env.render(mode='rgb_array'))
