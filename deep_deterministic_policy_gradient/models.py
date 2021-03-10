@@ -55,3 +55,4 @@ class Critic(nn.Module):
         x = F.leaky_relu(self.fc2(x))
         x = F.leaky_relu(self.fc3(x))
         return self.fc4(x)
+

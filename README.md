@@ -11,7 +11,7 @@ There are three reasons why **policy based methods** are useful:
    where action selection introduces randomness
 1. **Continuous action space**: Policy based methods are well-equipped to deal with continuous action spaces
 
-Two techniques looked at here are **cross entropy** and **hill climbing**.
+Two techniques looked at here are **cross entropy**, **hill climbing** and the **deep deterministic policy gradient**.
 
 ### Installing required packages
 To install all required packages, run:
