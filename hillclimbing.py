@@ -32,19 +32,26 @@ def test(env, policy):
     env.close()
 
 
-def hill_climbing(policy, env, episodes=1000, max_iterations=1000, discount_factor=.99, noise_scale=1e-2, target=100.0):
+def hill_climbing(policy, env, num_episodes=1000, max_time_steps=1000, discount_factor=.99, noise_scale=1e-2,
+                  target=200.0):
     """
-
-    :return:
+    :param policy: The hill climbing policy taking the actions
+    :param env: The gym environment to use
+    :param num_episodes: the maximum number of episodes to train the agent
+    :param discount_factor: Factor to discount the rewards
+    :param max_time_steps: Maximum iterations per episode
+    :param noise_scale: Factor that controls/scales the noise
+    :param target: Target score to reach
+    :return: Accumulated scores
     """
     scores_deque = deque(maxlen=100)
     scores = []
     best_reward = -np.inf
     best_weight = policy.w
-    for episode in range(1, episodes + 1):
+    for episode in range(1, num_episodes + 1):
         rewards = []
         state = env.reset()
-        for it in range(max_iterations):
+        for it in range(max_time_steps):
             action = policy.act(state)
             state, reward, done, _ = env.step(action)
             rewards.append(reward)
@@ -69,10 +76,21 @@ def hill_climbing(policy, env, episodes=1000, max_iterations=1000, discount_fact
         if episode % 100 == 0:
             print('Episode {}\tAverage Score: {:.2f}'.format(episode, mean_scores))
         if mean_scores >= target:
-            print('Environment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(episode - 100, mean_scores))
+            print('Environment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(episode, mean_scores))
             policy.w = best_weight
             break
     return scores
+
+
+def run_hill_climbing_cmd(num_episodes, max_time_steps, plot_when_done=True):
+    env = gym.make('CartPole-v0')
+    env.seed(0)
+    np.random.seed(0)
+
+    policy = Policy(env.observation_space.shape[0], env.action_space.n)
+    scores = hill_climbing(policy, env, num_episodes=num_episodes, max_time_steps=max_time_steps)
+    if plot_when_done:
+        plot(scores)
 
 
 if __name__ == '__main__':

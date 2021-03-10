@@ -1,6 +1,6 @@
 """ This is a basic implementation of the 'Reinforce' algorithm of Policy Gradient Methods """
 
-from policy_based_methods_udacity.common import *
+from common import *
 import torch.optim as optim
 
 

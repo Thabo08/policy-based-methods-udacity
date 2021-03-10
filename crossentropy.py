@@ -1,8 +1,6 @@
 
 from common import *
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 
 class Agent(nn.Module):
     """ The learning agent """
@@ -83,13 +81,13 @@ class Agent(nn.Module):
 
 
 def cross_entropy_method(agent_, num_episodes=500, sigma=.5, population_size=50, discount_factor=1.0,
-                         max_iterations=1000, elite_frac=.2, filename='checkpoint.pth'):
+                         max_time_steps=1000, elite_frac=.2, filename='checkpoint.pth'):
     """ Implements the cross entropy method to train the agent. The goal with cross entropy is to evaluate the policy
     return by passing the average weight of the top X weights to the neural network
     :param filename: file name to store the model weights
     :param elite_frac: percentage of top policies to use in update
-    :param discount_factor:
-    :param max_iterations:
+    :param discount_factor: Factor to discount the rewards
+    :param max_time_steps: Maximum iterations per episode
     :param agent_: the agent to be trained
     :param num_episodes: the maximum number of episodes to train the agent
     :param sigma: standard deviation of additive noise
@@ -103,7 +101,7 @@ def cross_entropy_method(agent_, num_episodes=500, sigma=.5, population_size=50,
     num_elite = int(elite_frac * population_size)
     for episode in range(1, num_episodes + 1):
         population_weights = [best_avg_weight + additive_noise for _ in range(population_size)]
-        rewards = np.array([agent_.evaluate(weights, discount_factor, max_iterations) for weights in population_weights])
+        rewards = np.array([agent_.evaluate(weights, discount_factor, max_time_steps) for weights in population_weights])
 
         elite_indexes = rewards.argsort()[-num_elite:]
         elite_weights = [population_weights[i] for i in elite_indexes]
@@ -114,24 +112,13 @@ def cross_entropy_method(agent_, num_episodes=500, sigma=.5, population_size=50,
         scores.append(reward)
 
         mean_score = np.mean(scores_deque)
-        if episode % 10 == 0:
-            print('Episode {}\tAverage Score: {:.2f}'.format(episode, mean_score))
+        print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode, mean_score), end="")
 
         if mean_score >= 90.0:
-            print('\nEnvironment solved in {:d} iterations!\tAverage Score: {:.2f}'.format(episode - 100, mean_score))
+            print('\nEnvironment solved in {:d} iterations!\tAverage Score: {:.2f}'.format(episode, mean_score))
             torch.save(agent.state_dict(), filename)
             break
     return scores
-
-
-def plot_scores(scores):
-    # plot the scores
-    fig = plt.figure()
-    fig.add_subplot(111)
-    plt.plot(np.arange(1, len(scores) + 1), scores)
-    plt.ylabel('Score')
-    plt.xlabel('Episode #')
-    plt.show()
 
 
 def test(agent, filename):
@@ -155,14 +142,21 @@ def test(agent, filename):
     env.close()
 
 
+def run_cross_entropy_cmd(num_episodes, max_time_steps, plot_when_done=True):
+    agent = Agent("MountainCarContinuous-v0").to(DEVICE)
+    scores = cross_entropy_method(agent, num_episodes=num_episodes, max_time_steps=max_time_steps)
+    if plot_when_done:
+        plot(scores)
+
+
 if __name__ == '__main__':
-    agent = Agent("MountainCarContinuous-v0").to(device)
+    agent = Agent("MountainCarContinuous-v0").to(DEVICE)
     train = True
     doing = lambda mode: print("Training agent" if mode else "Testing agent")
     if train:
         doing(train)
-        scores = cross_entropy_method(agent, max_iterations=500)
-        plot_scores(scores)
+        scores = cross_entropy_method(agent, max_time_steps=500)
+        plot(scores)
     else:
         doing(train)
         test(agent, filename='checkpoint.pth')

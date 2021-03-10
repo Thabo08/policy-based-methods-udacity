@@ -2,7 +2,7 @@
 Deep Deterministic Policy Gradient (DDPG) algorithm """
 
 from models import Actor, Critic
-from policy_based_methods_udacity.common import *
+from common import *
 import torch.optim as optim
 import random
 import copy
@@ -220,6 +220,15 @@ def run_ddpg(env: gym.Env, agent: Agent, num_episodes=2000, max_time_steps=700):
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode, mean_score))
 
     return scores
+
+
+def run_ddpg_cmd(num_episodes, max_time_steps, plot_when_done=True):
+    env = gym.make('MountainCarContinuous-v0')
+    env.seed(10)
+    agent = Agent(state_size=env.observation_space.shape[0], action_size=env.action_space.shape[0], seed=10)
+    scores = run_ddpg(env, agent, num_episodes=num_episodes, max_time_steps=max_time_steps)
+    if plot_when_done:
+        plot(scores)
 
 
 if __name__ == '__main__':

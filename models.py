@@ -1,7 +1,7 @@
 """ This file holds the implementation of the Actor (policy function) and the Critic (value function) models used
  in the DDPG algorithm """
 
-from policy_based_methods_udacity.common import *
+from common import *
 
 
 def hidden_init(layer):
