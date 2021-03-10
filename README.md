@@ -11,8 +11,20 @@ There are three reasons why **policy based methods** are useful:
    where action selection introduces randomness
 1. **Continuous action space**: Policy based methods are well-equipped to deal with continuous action spaces
 
-Two techniques looked at here are **cross entropy**, **hill climbing** and the **deep deterministic policy gradient**.
+The techniques looked at here are **cross entropy**, **hill climbing** and the **deep deterministic policy gradient**.
 
 ### Installing required packages
 To install all required packages, run:
 ```pip install -r requirements.txt```
+
+### Usage
+A single script can be executed from the command line to run different implementations of policy gradient methods. The 
+help print out showing the usage can be done running the following command:
+```commandline
+python runner.py -h
+```
+The following shows an example of running the DDPG algorithm with 2000 episodes, a 1000 time steps and, a flag indicating
+whether to plot the results upon training completion:
+```commandline
+python runner.py ddpg --episodes 2000 --timesteps 1000 --plot true
+```

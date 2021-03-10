@@ -12,8 +12,8 @@ if __name__ == '__main__':
     parser.add_argument("--plot", choices=["true", "false"], help="Flag indicating whether to plot the scores or not")
     args = parser.parse_args()
 
-    num_episodes = args.episodes
-    max_time_steps = args.timesteps
+    num_episodes = int(args.episodes)
+    max_time_steps = int(args.timesteps)
     method = args.method
     plot = args.plot == "true"
     print("Running the {} method. Max number of episodes {}, max number of time steps {}".format(method, num_episodes,
