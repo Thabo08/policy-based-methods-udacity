@@ -33,9 +33,9 @@ class Actor(nn.Module):
         reset_parameters([self.fc1, self.fc2])
 
     def forward(self, state):
+        """ Perform forward pass and map state to action """
         state = F.relu(self.fc1(state))
-        state = F.relu(self.fc2(state))
-        return torch.tanh(state)  # this helps to bound the actions to [-1, 1]
+        return torch.tanh(self.fc2(state))  # this helps to bound the actions to [-1, 1]
 
 
 class Critic(nn.Module):

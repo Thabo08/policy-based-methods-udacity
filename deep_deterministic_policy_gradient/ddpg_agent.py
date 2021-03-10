@@ -18,6 +18,7 @@ TAU = 1e-3
 
 
 def minimize_loss(loss, optimizer: optim.Adam):
+    """ Minimize the loss and optimize the model weights """
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
@@ -67,6 +68,7 @@ class Agent:
         self.ready_to_learn = len(self.memory) > BATCH_SIZE
 
     def reset(self):
+        """ Reset the action noise """
         self.noise.reset()
 
     def act(self, state, add_noise=True):
@@ -186,6 +188,12 @@ class ReplayBuffer:
 
 
 def run_ddpg(env: gym.Env, agent: Agent, num_episodes=2000, max_time_steps=700):
+    """ Runs the DDPG algorithm
+        :param env: The gym environment to use
+        :param agent: The agent to train
+        :param num_episodes: The maximum number of episodes to train the agent
+        :param max_time_steps: Max time steps to interact with the environment per episode
+    """
     scores_deque = deque(maxlen=100)
     scores = []
 
@@ -204,18 +212,18 @@ def run_ddpg(env: gym.Env, agent: Agent, num_episodes=2000, max_time_steps=700):
         scores.append(score)
         scores_deque.append(scores)
 
-        mean_scores = np.mean(scores_deque)
+        mean_score = np.mean(scores_deque)
+        print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode, mean_score), end="")
         if episode % 100 == 0:
             torch.save(agent.actor_local.state_dict(), 'checkpoint_actor.pth')
             torch.save(agent.critic_local.state_dict(), 'checkpoint_critic.pth')
-            print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode, mean_scores))
+            print('\rEpisode {}\tAverage Score: {:.2f}'.format(episode, mean_score))
 
     return scores
 
 
 if __name__ == '__main__':
     env = gym.make('MountainCarContinuous-v0')
-    # env = gym.make('BipedalWalker-v3')
     env.seed(10)
     agent = Agent(state_size=env.observation_space.shape[0], action_size=env.action_space.shape[0], seed=10)
     scores = run_ddpg(env, agent, num_episodes=100)
